@@ -33,12 +33,12 @@ mod os {
         let resolution_ns = unsafe {
             // See `std/sys/pal/unix/time.rs`, `Instant::now`.
             #[cfg(target_vendor = "apple")]
-            const clock_id: clockid_t = libc::CLOCK_UPTIME_RAW;
+            const CLOCK_ID: clockid_t = libc::CLOCK_UPTIME_RAW;
             #[cfg(not(target_vendor = "apple"))]
-            const clock_id: clockid_t = libc::CLOCK_MONOTONIC;
+            const CLOCK_ID: clockid_t = libc::CLOCK_MONOTONIC;
 
             let mut tp = mem::zeroed();
-            clock_getres(clock_id, &mut tp);
+            clock_getres(CLOCK_ID, &mut tp);
             tp.tv_nsec as u64
         };
 
