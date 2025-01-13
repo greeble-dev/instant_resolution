@@ -26,13 +26,19 @@ mod os {
 #[cfg(target_family = "unix")]
 mod os {
     use super::*;
-    use libc::{clock_getres, CLOCK_MONOTONIC};
+    use libc::{clock_getres, clockid_t, CLOCK_MONOTONIC, CLOCK_UPTIME_RAW};
     use std::mem;
 
     pub fn os() {
         let resolution_ns = unsafe {
+            // See `std/sys/pal/unix/time.rs`, `Instant::now`.
+            #[cfg(target_vendor = "apple")]
+            const clock_id: clockid_t = CLOCK_UPTIME_RAW;
+            #[cfg(not(target_vendor = "apple"))]
+            const clock_id: clockid_t = CLOCK_MONOTONIC;
+
             let mut tp = mem::zeroed();
-            clock_getres(CLOCK_MONOTONIC, &mut tp);
+            clock_getres(clock_id, &mut tp);
             tp.tv_nsec as u64
         };
 
