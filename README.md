@@ -1,4 +1,4 @@
-A toy program for checking the resolution of Rust's `std::time::Instant`.
+A toy program for checking the resolution of Rust's `std::time::Instant`. Use only for entertainment.
 
 ```
 git clone https://github.com/greeble-dev/instant_resolution.git
