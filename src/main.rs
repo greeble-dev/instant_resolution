@@ -3,7 +3,6 @@ use std::time::{Duration, Instant};
 
 #[cfg(windows)]
 mod os {
-
     use super::*;
     use std::mem;
     use windows_sys::Win32::System::Performance::QueryPerformanceFrequency;
@@ -24,7 +23,29 @@ mod os {
     }
 }
 
-#[cfg(not(windows))]
+#[cfg(target_family = "unix")]
+mod os {
+    use super::*;
+    use std::mem;
+    use libc::{clock_getres, CLOCK_MONOTONIC};
+
+    pub fn os() {
+        let resolution_ns = unsafe {
+            let mut tp = mem::zeroed();
+            clock_getres(CLOCK_MONOTONIC, &mut tp);
+            tp.tv_nsec as u64
+        };
+
+        let resolution = Duration::from_nanos(resolution_ns);
+
+        println!(
+            "OS: {:?} ({}/{}, clock_getres(CLOCK_MONOTONIC) = {})",
+            resolution, OS, ARCH, resolution_ns
+        );
+    }
+}
+
+#[cfg(not(any(windows, target_family = "unix")))]
 mod os {
     use super::*;
 

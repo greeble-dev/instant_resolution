@@ -5,3 +5,6 @@ edition = "2021"
 
 [target.'cfg(windows)'.dependencies]
 windows-sys = { version = "0.59", features = ["Win32_System_Performance"] }
+
+[target.'cfg(target_family = "unix")'.dependencies]
+libc = "0.2"
