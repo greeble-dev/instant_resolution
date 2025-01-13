@@ -3,15 +3,16 @@ use std::time::{Duration, Instant};
 
 #[cfg(windows)]
 mod os {
+
     use super::*;
     use std::mem;
-    use winapi::um::profileapi::QueryPerformanceFrequency;
+    use windows_sys::Win32::System::Performance::QueryPerformanceFrequency;
 
     pub fn os() {
         let freq = unsafe {
             let mut freq_raw = mem::zeroed();
             QueryPerformanceFrequency(&mut freq_raw);
-            *freq_raw.QuadPart() as u64
+            freq_raw as u64
         };
 
         let resolution = Duration::from_nanos(1_000_000_000u64 / freq);
