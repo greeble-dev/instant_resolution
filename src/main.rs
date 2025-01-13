@@ -4,12 +4,11 @@ use std::time::{Duration, Instant};
 #[cfg(target_family = "windows")]
 mod os {
     use super::*;
-    use std::mem;
     use windows_sys::Win32::System::Performance::QueryPerformanceFrequency;
 
     pub fn os() {
         let freq_ns = unsafe {
-            let mut freq_raw = mem::zeroed();
+            let mut freq_raw = std::mem::zeroed();
             QueryPerformanceFrequency(&mut freq_raw);
             freq_raw as u64
         };
@@ -23,8 +22,6 @@ mod os {
 #[cfg(target_family = "unix")]
 mod os {
     use super::*;
-    use libc::{clock_getres, clockid_t};
-    use std::mem;
 
     pub fn os() {
         // See `std/sys/pal/unix/time.rs`, `Instant::now`.
@@ -34,8 +31,8 @@ mod os {
         let (clock_id, clock_name) = (libc::CLOCK_MONOTONIC, "CLOCK_MONOTONIC");
 
         let resolution_ns = unsafe {
-            let mut tp = mem::zeroed();
-            clock_getres(clock_id, &mut tp);
+            let mut tp = std::mem::zeroed();
+            libc::clock_getres(clock_id, &mut tp);
             tp.tv_nsec as u64
         };
 
