@@ -8,18 +8,15 @@ mod os {
     use windows_sys::Win32::System::Performance::QueryPerformanceFrequency;
 
     pub fn os() {
-        let freq = unsafe {
+        let freq_ns = unsafe {
             let mut freq_raw = mem::zeroed();
             QueryPerformanceFrequency(&mut freq_raw);
             freq_raw as u64
         };
 
-        let resolution = Duration::from_nanos(1_000_000_000u64 / freq);
+        let resolution = Duration::from_nanos(1_000_000_000u64 / freq_ns);
 
-        println!(
-            "OS: {:?} ({}/{}, QueryPerformanceFrequency = {})",
-            resolution, OS, ARCH, freq
-        );
+        println!("OS: {resolution:?} ({OS}/{ARCH}, QueryPerformanceFrequency = {freq_ns})");
     }
 }
 
@@ -30,24 +27,21 @@ mod os {
     use std::mem;
 
     pub fn os() {
-        let resolution_ns = unsafe {
-            // See `std/sys/pal/unix/time.rs`, `Instant::now`.
-            #[cfg(target_vendor = "apple")]
-            const CLOCK_ID: clockid_t = libc::CLOCK_UPTIME_RAW;
-            #[cfg(not(target_vendor = "apple"))]
-            const CLOCK_ID: clockid_t = libc::CLOCK_MONOTONIC;
+        // See `std/sys/pal/unix/time.rs`, `Instant::now`.
+        #[cfg(target_vendor = "apple")]
+        let (clock_id, clock_name) = (libc::CLOCK_UPTIME_RAW, "CLOCK_UPTIME_RAW");
+        #[cfg(not(target_vendor = "apple"))]
+        let (clock_id, clock_name) = (libc::CLOCK_MONOTONIC, "CLOCK_MONOTONIC");
 
+        let resolution_ns = unsafe {
             let mut tp = mem::zeroed();
-            clock_getres(CLOCK_ID, &mut tp);
+            clock_getres(clock_id, &mut tp);
             tp.tv_nsec as u64
         };
 
         let resolution = Duration::from_nanos(resolution_ns);
 
-        println!(
-            "OS: {:?} ({}/{}, clock_getres(CLOCK_MONOTONIC) = {})",
-            resolution, OS, ARCH, resolution_ns
-        );
+        println!("OS: {resolution:?} ({OS}/{ARCH}, clock_getres({clock_name}) = {resolution_ns})");
     }
 }
 
@@ -56,7 +50,7 @@ mod os {
     use super::*;
 
     pub fn os() {
-        println!("OS: not implemented ({}/{})", OS, ARCH);
+        println!("OS: not implemented ({OS}/{ARCH})");
     }
 }
 
