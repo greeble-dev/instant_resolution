@@ -3,7 +3,7 @@ name = "instant_resolution"
 version = "0.1.0"
 edition = "2021"
 
-[target.'cfg(windows)'.dependencies]
+[target.'cfg(target_family = "windows")'.dependencies]
 windows-sys = { version = "0.59", features = ["Win32_System_Performance"] }
 
 [target.'cfg(target_family = "unix")'.dependencies]

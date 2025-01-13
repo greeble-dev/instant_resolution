@@ -1,7 +1,7 @@
 use std::env::consts::{ARCH, OS};
 use std::time::{Duration, Instant};
 
-#[cfg(windows)]
+#[cfg(target_family = "windows")]
 mod os {
     use super::*;
     use std::mem;
@@ -26,8 +26,8 @@ mod os {
 #[cfg(target_family = "unix")]
 mod os {
     use super::*;
-    use std::mem;
     use libc::{clock_getres, CLOCK_MONOTONIC};
+    use std::mem;
 
     pub fn os() {
         let resolution_ns = unsafe {
@@ -45,7 +45,7 @@ mod os {
     }
 }
 
-#[cfg(not(any(windows, target_family = "unix")))]
+#[cfg(not(any(target_family = "windows", target_family = "unix")))]
 mod os {
     use super::*;
 
