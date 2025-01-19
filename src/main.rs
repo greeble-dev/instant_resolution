@@ -15,7 +15,7 @@ mod os {
 
         let resolution = Duration::from_nanos(1_000_000_000u64 / freq_ns);
 
-        println!("OS: {resolution:?} ({OS}/{ARCH}, QueryPerformanceFrequency = {freq_ns})");
+        println!("Guessed: {resolution:?} (QueryPerformanceFrequency = {freq_ns})");
     }
 }
 
@@ -38,17 +38,13 @@ mod os {
 
         let resolution = Duration::from_nanos(resolution_ns);
 
-        println!("OS: {resolution:?} ({OS}/{ARCH}, clock_getres({clock_name}) = {resolution_ns})");
+        println!("Guessed: {resolution:?} (clock_getres({clock_name}) = {resolution_ns})");
     }
 }
 
 #[cfg(not(any(target_family = "windows", target_family = "unix")))]
 mod os {
-    use super::*;
-
-    pub fn os() {
-        println!("OS: not implemented ({OS}/{ARCH})");
-    }
+    pub fn os() {}
 }
 
 fn single_measure() -> Duration {
@@ -64,7 +60,7 @@ fn single_measure() -> Duration {
 }
 
 fn measure() {
-    const ITERATIONS: usize = 100;
+    const ITERATIONS: usize = 1000;
     let mut min = Duration::MAX;
 
     for _ in 0..ITERATIONS {
@@ -75,6 +71,7 @@ fn measure() {
 }
 
 fn main() {
-    measure();
+    println!("OS: {OS}/{ARCH}");
     os::os();
+    measure();
 }
